@@ -48,7 +48,7 @@ func (n *Node) SetNext(nth int, x *Node) {
 	n.next[nth] = x
 }
 
-type skipListIterator interface {
+type SkipListIterator interface {
 	Valid() bool
 	GetKV() Pair
 	Next()
@@ -59,8 +59,8 @@ type skipListIterator interface {
 	Close()
 }
 
-type skipListOperator interface {
-	NewIterator() skipListIterator
+type SkipListOperator interface {
+	NewIterator() SkipListIterator
 	Insert(Pair)
 	InsertKV(k, v []byte)
 	InsertKVString(k, v string)
@@ -128,7 +128,7 @@ type skipList struct {
 	refCount   int64
 }
 
-func NewSkipList(comp func(k1, k2 interface{}) int) skipListOperator {
+func NewSkipList(comp func(k1, k2 interface{}) int) SkipListOperator {
 	rand.Seed(time.Now().UnixNano())
 	skipList := &skipList{max_height: 1, comparator: comp}
 	skipList.head = skipList.NewNode(Pair{}, MaxHeight)
@@ -248,7 +248,7 @@ func (s *skipList) decRef() {
 	atomic.AddInt64(&s.refCount, -1)
 }
 
-func (s *skipList) NewIterator() skipListIterator {
+func (s *skipList) NewIterator() SkipListIterator {
 	iter := &skipIterWrap{list: s, node: nil}
 	s.incRef()
 	return iter
